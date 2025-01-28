@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@fastify/middie": "^8.3.0",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
     "telegraf": "^4.16.3",

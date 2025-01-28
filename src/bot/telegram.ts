@@ -1,4 +1,5 @@
 import { Telegraf } from 'telegraf';
+import { Update } from 'telegraf/types';
 import { env } from '../config/environment';
 
 export class TelegramBot {
@@ -22,9 +23,23 @@ export class TelegramBot {
     return this.bot.webhookCallback(this.WEBHOOK_PATH);
   }
 
+  public async handleUpdate(update: Update): Promise<void> {
+    return await this.bot.handleUpdate(update);
+  }
+
   public async setWebhook(): Promise<void> {
     await this.bot.telegram.setWebhook(this.WEBHOOK_URL);
   }
+
+  public async getBotInfo() {
+    const botInfo = await this.bot.telegram.getMe();
+    return {
+      username: botInfo.username,
+      id: botInfo.id,
+      isBot: botInfo.is_bot
+    };
+  }
+
 }
 
 export const telegramBot = new TelegramBot();

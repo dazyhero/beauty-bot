@@ -1,12 +1,18 @@
 import { Telegraf } from 'telegraf';
 import { Command } from './types';
 import { StartCommand } from './start.command';
+import { AnalyzeCommand } from './analyze.command';
+import { FastifyBaseLogger } from 'fastify';
 
 export class CommandRegistry {
-  private commands: Command[] = [
-    new StartCommand(),
-  ];
+  private commands: Command[];
 
+  constructor(private readonly logger: FastifyBaseLogger) {
+    this.commands = [
+      new StartCommand(),
+      new AnalyzeCommand(this.logger),
+    ];
+  }
   public registerCommands(bot: Telegraf): void {
     for (const command of this.commands) {
       if (command.command === 'text') {

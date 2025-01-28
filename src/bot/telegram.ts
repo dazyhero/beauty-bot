@@ -2,6 +2,7 @@ import { Telegraf } from 'telegraf';
 import { Update } from 'telegraf/types';
 import { env } from '../config/environment';
 import { CommandRegistry } from './commands';
+import { FastifyBaseLogger } from 'fastify';
 
 export class TelegramBot {
   private bot: Telegraf;
@@ -9,10 +10,10 @@ export class TelegramBot {
   public readonly WEBHOOK_URL: string;
   public readonly commandRegistry: CommandRegistry
 
-  constructor() {
+  constructor(logger: FastifyBaseLogger) {
     this.bot = new Telegraf(env.BOT_TOKEN);
     this.WEBHOOK_URL = `https://${env.DOMAIN}${this.WEBHOOK_PATH}`;
-    this.commandRegistry = new CommandRegistry();
+    this.commandRegistry = new CommandRegistry(logger);
     this.setupCommands();
   }
 
@@ -46,6 +47,3 @@ export class TelegramBot {
   }
 
 }
-
-export const telegramBot = new TelegramBot();
-

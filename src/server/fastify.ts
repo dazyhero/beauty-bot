@@ -1,13 +1,14 @@
 import Fastify, { FastifyInstance } from 'fastify';
-import { telegramBot } from '../bot/telegram';
 import { env } from '../config/environment';
 import { Update } from 'telegraf/types';
 import { Logger } from '../utils/logger';
 import { TelegramUpdateUtils } from '../utils/telegram-updates';
+import { TelegramBot } from '../bot/telegram';
 
 export class Server {
   private fastify: FastifyInstance;
   private logger: Logger;
+  private telegramBot: TelegramBot
 
   constructor() {
     this.fastify = Fastify({
@@ -28,6 +29,7 @@ export class Server {
       bodyLimit: 10 * 1024 * 1024
     });
     this.logger = new Logger(this.fastify.log);
+    this.telegramBot = new TelegramBot(this.fastify.log)
     this.setupRoutes();
   }
 
@@ -40,7 +42,7 @@ export class Server {
       return { status: 'Telegram Bot is running!' };
     });
 
-    this.fastify.post(telegramBot.WEBHOOK_PATH, async (request, reply) => {
+    this.fastify.post(this.telegramBot.WEBHOOK_PATH, async (request, reply) => {
       try {
         const update = request.body as Update;
         const updateInfo = {
@@ -50,7 +52,7 @@ export class Server {
         };
         this.logger.debug('Received webhook update', updateInfo);
 
-        await telegramBot.handleUpdate(update);
+        await this.telegramBot.handleUpdate(update);
 
         this.logger.info('Successfully processed webhook update', {
           updateId: update.update_id
@@ -79,10 +81,10 @@ export class Server {
         nodeEnv: process.env.NODE_ENV
       });
 
-      await telegramBot.setWebhook();
+      await this.telegramBot.setWebhook();
       this.logger.info('Telegram webhook configured', {
-        webhookUrl: telegramBot.WEBHOOK_URL,
-        botInfo: await telegramBot.getBotInfo()
+        webhookUrl: this.telegramBot.WEBHOOK_URL,
+        botInfo: await this.telegramBot.getBotInfo()
       });
     } catch (error) {
       this.logger.error('Failed to start server', error, {

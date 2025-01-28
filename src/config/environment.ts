@@ -7,6 +7,7 @@ const envSchema = z.object({
   BOT_TOKEN: z.string(),
   PORT: z.string().default('3000'),
   DOMAIN: z.string(),
+  OPENAI_API_KEY: z.string()
 });
 
 const envParse = envSchema.safeParse(process.env);

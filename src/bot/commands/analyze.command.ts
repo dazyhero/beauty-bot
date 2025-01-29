@@ -3,7 +3,6 @@ import { Command } from './types';
 import { OpenAIService } from '../../services/openai.service';
 import { Logger } from '../../utils/logger';
 import { FastifyBaseLogger } from 'fastify';
-import { escapeMarkdownV2 } from '../../utils/escape-markdown';
 
 export class AnalyzeCommand implements Command {
   public command = 'analyze';
@@ -19,7 +18,6 @@ export class AnalyzeCommand implements Command {
 
   public async handler(ctx: Context & { message?: { text?: string } }): Promise<void> {
     try {
-      // Get the message text without the command
       const text = ctx.message && 'text' in ctx.message ? ctx.message.text : undefined;
       if (!text || text === '/analyze') {
         await ctx.reply(
@@ -35,9 +33,8 @@ export class AnalyzeCommand implements Command {
       await ctx.replyWithChatAction('typing');
 
       const analysis = await this.openAIService.analyzeIngredients(ingredients);
-      const escapedAnalysis = escapeMarkdownV2(analysis);
 
-      await ctx.reply(escapedAnalysis, { parse_mode: 'MarkdownV2' });
+      await ctx.reply(analysis, { parse_mode: 'Markdown' });
     } catch (error) {
       this.logger.error('Error analyzing ingredients', error);
       await ctx.reply('Вибачте, сталася помилка при аналізі інгредієнтів. Спробуйте пізніше.');

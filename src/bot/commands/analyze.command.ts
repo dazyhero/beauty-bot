@@ -3,6 +3,7 @@ import { Command } from './types';
 import { OpenAIService } from '../../services/openai.service';
 import { Logger } from '../../utils/logger';
 import { FastifyBaseLogger } from 'fastify';
+import { escapeMarkdownV2 } from '../../utils/escape-markdown';
 
 export class AnalyzeCommand implements Command {
   public command = 'analyze';
@@ -34,8 +35,9 @@ export class AnalyzeCommand implements Command {
       await ctx.replyWithChatAction('typing');
 
       const analysis = await this.openAIService.analyzeIngredients(ingredients);
+      const escapedAnalysis = escapeMarkdownV2(analysis);
 
-      await ctx.reply(analysis, { parse_mode: 'MarkdownV2' });
+      await ctx.reply(escapedAnalysis, { parse_mode: 'MarkdownV2' });
     } catch (error) {
       this.logger.error('Error analyzing ingredients', error);
       await ctx.reply('Вибачте, сталася помилка при аналізі інгредієнтів. Спробуйте пізніше.');

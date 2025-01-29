@@ -35,7 +35,7 @@ export class AnalyzeCommand implements Command {
 
       const analysis = await this.openAIService.analyzeIngredients(ingredients);
 
-      await ctx.reply(analysis, { parse_mode: 'HTML' });
+      await ctx.reply(analysis, { parse_mode: 'MarkdownV2' });
     } catch (error) {
       this.logger.error('Error analyzing ingredients', error);
       await ctx.reply('Вибачте, сталася помилка при аналізі інгредієнтів. Спробуйте пізніше.');
